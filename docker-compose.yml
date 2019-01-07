@@ -1,0 +1,33 @@
+version: '3'
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: abc123
+      TZ: America/Santiago
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+  web:
+    build: .
+    command: ./docker_scripts/start.sh
+    # command: ./docker_scripts/initialize.sh
+    container_name: "railsPG"
+    volumes:
+      - ./src:/app_directory
+      - ./scripts:/app_directory/docker_scripts
+
+      # Cache para guardar las gemas <3
+      - bundle_cache:/bundle
+    environment:
+        TZ: America/Santiago
+    links:
+        - db
+    depends_on:
+        - db
+    ports:
+      - 3000:3000
+      - 8808:8808
+volumes:
+  bundle_cache:
